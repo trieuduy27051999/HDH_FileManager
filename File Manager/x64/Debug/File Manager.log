@@ -1,3 +1,16 @@
-﻿  Source.cpp
+﻿  sector.cpp
+D:\Working\HDH_FileManager\File Manager\sector.h(3,1): warning C4103: alignment changed after including header, may be due to missing #pragma pack(pop)
+D:\Working\HDH_FileManager\File Manager\sector.cpp(116,28): warning C4244: 'initializing': conversion from 'DWORD' to 'WORD', possible loss of data
+D:\Working\HDH_FileManager\File Manager\sector.cpp(120,55): warning C4244: '=': conversion from '_Ty' to 'WORD', possible loss of data
+          with
+          [
+              _Ty=DWORD
+          ]
+D:\Working\HDH_FileManager\File Manager\sector.cpp(298,19): warning C4244: 'initializing': conversion from 'DWORD' to 'WORD', possible loss of data
+D:\Working\HDH_FileManager\File Manager\sector.cpp(302,10): warning C4101: 'Check': unreferenced local variable
+D:\Working\HDH_FileManager\File Manager\sector.cpp(317,70): warning C4244: 'return': conversion from 'DWORD' to 'WORD', possible loss of data
+  Source.cpp
 D:\Working\HDH_FileManager\File Manager\Source.cpp(116,59): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+D:\Working\HDH_FileManager\File Manager\sector.cpp(92): warning C4715: 'ReadSector': not all control paths return a value
   File Manager.vcxproj -> D:\Working\HDH_FileManager\x64\Debug\File Manager.exe
