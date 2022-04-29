@@ -96,3 +96,4 @@ typedef struct FileInfo
 
 #endif
 
+#pragma pack()
