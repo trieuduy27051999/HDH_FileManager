@@ -425,22 +425,30 @@ WORD convertClusterToSector(BPB _bpb, WORD cluster) {
 }
 void PrintDataOfArchive(vector<DWORD> cluster, DWORD size,BPB _bpb) {
     DWORD current_sector = 0;
-    DWORD index = 0;
+    DWORD index;
     BYTE sector[512];
     for (auto clus : cluster) {
+        index = 0;
         current_sector = clus * _bpb.BPB_SecPerClus + _bpb.BPB_RsvdSecCnt + _bpb.BPB_NumFATs * _bpb.BPB_FATSz32;
         while (index < _bpb.BPB_SecPerClus && size >= _bpb.BPB_BytsPerSec) {
             memset(sector, 0, 512);
+            BYTE tmp[513];
             ReadSector(L"\\\\.\\E:", (current_sector +index) * 512, sector);
-            printf("%s", sector);
+            memcpy(tmp, sector, 512);
+            tmp[512] = '\0';
+            printf("%s", tmp);
             size -= _bpb.BPB_BytsPerSec;
+            index++;
         }
-        if (size > 0) {
+        if (size > 0&&size< _bpb.BPB_BytsPerSec) {
             memset(sector, 0, 512);
             ReadSector(L"\\\\.\\E:", (current_sector + index) * 512, sector);
-            BYTE* tmp = new BYTE[size];
+            BYTE* tmp = new BYTE[size+1];
+
             memcpy(tmp, sector, size);
+            tmp[size] = '\0';
             printf("%s", tmp);
+            delete tmp;
         }
 
     }
