@@ -103,7 +103,7 @@ void showBootSectorInformation(BPB _bpb)
     printf("Number of sector in FATS : %d\n", _bpb.BPB_FATSz32);
     printf("First sector of FAT: %d \n", _bpb.BPB_RsvdSecCnt);
     printf("First sector of RDET: %d \n", _bpb.BPB_RsvdSecCnt + _bpb.BPB_NumFATs * _bpb.BPB_FATSz32);
-    printf("First sector of RDET: %d \n", _bpb.BPB_RsvdSecCnt + _bpb.BPB_NumFATs * _bpb.BPB_FATSz32);
+    printf("First sector of DATA: %d \n", _bpb.BPB_RsvdSecCnt + _bpb.BPB_NumFATs * _bpb.BPB_FATSz32);
 }
 
 vector<FileInfo> showRootDirectoryOrSubFolder(vector<DWORD> clusters, BPB _bpb, LPCWSTR  drive)
@@ -327,14 +327,18 @@ void PrintDataOfArchive(vector<DWORD> cluster, DWORD size, BPB _bpb, LPCWSTR  dr
         while (index < _bpb.BPB_SecPerClus && size >= _bpb.BPB_BytsPerSec) {
             memset(sector, 0, 512);
             ReadSector(drive, (current_sector + index) * 512, sector);
+            BYTE tmp[513];
+            memcpy(tmp, sector, 512);
+            tmp[512] = '\0';
             printf("%s", sector);
             size -= _bpb.BPB_BytsPerSec;
         }
         if (size > 0) {
             memset(sector, 0, 512);
             ReadSector(drive, (current_sector + index) * 512, sector);
-            BYTE* tmp = new BYTE[size];
+            BYTE* tmp = new BYTE[size+1];
             memcpy(tmp, sector, size);
+            tmp[size] = '\0';
             printf("%s", tmp);
         }
 

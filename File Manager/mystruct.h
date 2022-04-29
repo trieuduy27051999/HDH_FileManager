@@ -11,6 +11,7 @@ typedef unsigned short WORD;
 typedef unsigned long DWORD;
 typedef wchar_t WBYTE;
 
+#pragma pack(1)
 typedef struct BIOS_Paramenter_Block{
     BYTE BS_jmpBoot[3];
     BYTE BS_OEMName[8];
@@ -95,3 +96,4 @@ typedef struct FileInfo
 
 #endif
 
+#pragma pack()
