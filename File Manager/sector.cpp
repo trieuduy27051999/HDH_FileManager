@@ -75,8 +75,9 @@ int ReadSector(LPCWSTR  drive, int readPoint, BYTE sector[512])
 
     if (device == INVALID_HANDLE_VALUE) // Open Error
     {
-        printf("CreateFile: %u\n", GetLastError());
-        return 1;
+        printf("CreateFileError: %u\n", GetLastError());
+        printf("Check drive letter.");
+        return -1;
     }
 
     SetFilePointer(device, readPoint, NULL, FILE_BEGIN);//Set a Point to Read
@@ -104,6 +105,18 @@ void showBootSectorInformation(BPB _bpb)
     printf("First sector of FAT: %d \n", _bpb.BPB_RsvdSecCnt);
     printf("First sector of RDET: %d \n", _bpb.BPB_RsvdSecCnt + _bpb.BPB_NumFATs * _bpb.BPB_FATSz32);
     printf("First sector of DATA: %d \n", _bpb.BPB_RsvdSecCnt + _bpb.BPB_NumFATs * _bpb.BPB_FATSz32);
+}
+
+void showPartitionBootSectorInformation(NTFS _bpb)
+{
+    printf("NTFS USB disk information \n");
+    printf("OEM Name : %s\n", _bpb.OEMName);
+    printf("Bytes per sector : %d \n", _bpb.Bytes_Per_Sector);
+    printf("Sector per cluster : %d \n", _bpb.Sectors_Per_Cluster);
+    printf("Number of reverse sector: %d \n", _bpb.Reserved_Sectors);
+    printf("Sector per track: %d\n", _bpb.BPB_SecPerTrk);
+    
+
 }
 
 vector<FileInfo> showRootDirectoryOrSubFolder(vector<DWORD> clusters, BPB _bpb, LPCWSTR  drive)

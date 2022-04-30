@@ -9,10 +9,18 @@
 
 #include "mystruct.h"
 #include "sector.h"
+#include "FAT32.h"
 
 using namespace std;
 
 #define MAX_LENGTH 510
+
+void Menu() {
+    cout << "Lua Chon Format cua USB:\n";
+    cout << "1. FAT32" << endl;
+    cout << "2. NTFS" << endl;
+    cout << "Khac.Thoat chuong trinh" << endl;
+}
 
 void Menu1() {
     cout << "Lua Chon:\n";
@@ -22,9 +30,9 @@ void Menu1() {
 }
 void Menu2() {
     cout << "Lua Chon:\n";
-    cout << "1. Xem noi dung tap tin/ thu muc" << endl;
-    cout << "2. Quay lai Menu" << endl;
-    cout << "Khac. Thoat chuong trinh " << endl;
+    cout << "1. Xem thong tin partition boot sector NTFS" << endl;
+    cout << "2.Xem thong tin thu muc goc " << endl;
+    cout << "Khac.Thoat chuong trinh" << endl;
 }
 
 int main(int argc, char** argv)
@@ -48,105 +56,94 @@ int main(int argc, char** argv)
     mbstowcs(wtext, path, strlen(path) + 1);//Plus null
     LPCWSTR drivepath = wtext;
 
-    ReadSector(drivepath, 0, sector);
+    int checkReadable = ReadSector(drivepath, 0, sector);
+    if (checkReadable == -1) return 0;
 
-    BPB _bpb;
-    memcpy(&_bpb, sector, 512);
-
+    
+    int formattype = 1;
     int choose = 1;
     do {
-        Menu1();
+        Menu();
         cout << "Nhap lua chon ";
-        cin >> choose;
-        switch (choose) {
+        cin >> formattype;
+        switch (formattype)
+        {
         case 1: {
-            showBootSectorInformation(_bpb);
-            break;
-        }
-        case 2: {
-            vector<DWORD> clusters_root;
-            DWORD currentCluster = 0;
-            while (currentCluster != -1) {
-                clusters_root.push_back(currentCluster);
-                DWORD nextCluster = ReadNextEntryOfFAT32(currentCluster, _bpb.BPB_RsvdSecCnt, drivepath);
-                currentCluster = nextCluster;
-            }
-            vector<FileInfo> container = showRootDirectoryOrSubFolder(clusters_root, _bpb, drivepath);
-
-            for (int i = 0; i < container.size(); i++) {
-                cout << "Number " << i << endl;
-                container[i].Print();
-            }
+            BPB _bpb;
+            memcpy(&_bpb, sector, 512);
             do {
-                Menu2();
+                Menu1();
                 cout << "Nhap lua chon ";
                 cin >> choose;
                 switch (choose) {
                 case 1: {
-                    int stt = -1;
-                    do {
-                        cout << "Nhap so thu tu thu muc/tap tin de xem noi dung (STT phai hop le) \n";
-                        cin >> stt;
-                        system("cls");
-                    } while (stt < 0 && stt >= container.size());
-                    FileInfo f = container[stt];
-
-                    if (f.fileAttributes == "Directory") {
-                        container.clear();
-                        vector<DWORD> clusters_sub;
-                        DWORD currentCluster = f.firstClusterAddress;
-                        while (currentCluster != -1) {
-                            clusters_sub.push_back(currentCluster);
-                            DWORD nextCluster = ReadNextEntryOfFAT32(currentCluster, _bpb.BPB_RsvdSecCnt, drivepath);
-                            currentCluster = nextCluster;
-                        }
-                        container = showRootDirectoryOrSubFolder(clusters_sub, _bpb, drivepath);
-                        for (int i = 0; i < container.size(); i++) {
-                            cout << "Number " << i << endl;
-                            container[i].Print();
-                        }
-
-
-                    }
-                    if (f.fileAttributes == "Archive") {
-                        for (int i = 0; i < container.size(); i++) {
-                            cout << "Number " << i << endl;
-                            container[i].Print();
-                        }
-                        int pos = f.FileName.find(L".txt");
-                        if (pos != wstring::npos) {
-                            vector<DWORD> clusters_file;
-                            DWORD currentCluster = f.firstClusterAddress;
-                            while (currentCluster != -1) {
-                                clusters_file.push_back(currentCluster);
-                                DWORD nextCluster = ReadNextEntryOfFAT32(currentCluster, _bpb.BPB_RsvdSecCnt, drivepath);
-                                currentCluster = nextCluster;
-                            }
-                            wcout << L"\nData of Txt :" << f.FileName << endl;;
-                            PrintDataOfArchive(clusters_file, f.sizeOfFile, _bpb, drivepath);
-                            cout << endl;
-                        }
-                        else {
-                            cout << "\n Need compatible software to open ! \n";
-                        }
-
-                    }
+                    showBootSectorInformation(_bpb);
                     break;
-
-
                 }
-                case 2:break;
+                case 2: {
+                    vector<DWORD> clusters_root;
+                    DWORD currentCluster = 0;
+                    while (currentCluster != -1) {
+                        clusters_root.push_back(currentCluster);
+                        DWORD nextCluster = ReadNextEntryOfFAT32(currentCluster, _bpb.BPB_RsvdSecCnt, drivepath);
+                        currentCluster = nextCluster;
+                    }
+                    vector<FileInfo> container = showRootDirectoryOrSubFolder(clusters_root, _bpb, drivepath);
+
+                    for (int i = 0; i < container.size(); i++) {
+                        cout << "Number " << i << endl;
+                        container[i].Print();
+                    }
+                    //int continuecase = 1;
+                    do {
+                        cout << "Lua Chon:\n";
+                        cout << "1. Xem noi dung tap tin/ thu muc" << endl;
+                        cout << "2. Quay lai Menu" << endl;
+                        cout << "Khac. Thoat chuong trinh " << endl;
+                        cout << "Nhap lua chon ";
+                        cin >> choose;
+                        switch (choose) {
+                        case 1: {
+                            exploreFAT32(_bpb, drivepath, container);
+                        }
+                        case 2: {
+                            break;
+                        }
+                        default: return 0;
+                        }
+                        break;
+                    } while (true);
+                    break;
+                }
+                default: {
+                    return 0;
+                }
+                }
+            } while (true);
+        }
+        case 2: {
+            NTFS _bpb;
+            memcpy(&_bpb, sector, 512);
+            do {
+                Menu2();
+                cout << "Nhap lua chon ";
+                cin >> choose;
+                switch (choose)
+                {
+                case 1: {
+                    showPartitionBootSectorInformation(_bpb);
+                    break;
+                }
                 default:
                     return 0;
                 }
             } while (true);
-
         }
-        default: {
+        default:
             return 0;
         }
-        }
     } while (true);
+    
 
 
 

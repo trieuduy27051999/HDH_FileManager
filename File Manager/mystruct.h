@@ -10,6 +10,11 @@ typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 typedef wchar_t WBYTE;
+#if !defined(_M_IX86)
+typedef __int64 LONGLONG;
+#else
+typedef double LONGLONG;
+#endif
 
 #pragma pack(1)
 typedef struct BIOS_Paramenter_Block{
@@ -43,6 +48,34 @@ typedef struct BIOS_Paramenter_Block{
     BYTE BS_Bootcode[420];
     WORD BS_Signature;
 } BPB;
+
+typedef struct NTFS_BPB
+{
+    BYTE BS_jmpBoot[3];
+    BYTE OEMName[8];
+    WORD Bytes_Per_Sector;
+    BYTE Sectors_Per_Cluster;
+    WORD Reserved_Sectors;
+    BYTE Zero1[3];
+    WORD NotUsedByNTFS1;
+    BYTE MediaDescriptor;
+    WORD Zero2;
+    WORD BPB_SecPerTrk;
+    WORD BPB_NumHeads;
+    DWORD BPB_HiddSec;
+    DWORD NotUsedByNTFS2;
+    DWORD NotUsedByNTFS3;
+    LONGLONG Total_Sec;
+    LONGLONG Logical_Cluster_Number_MFT;
+    LONGLONG Logical_Cluster_Number_MFTMirr;
+    DWORD Cluster_Per_File_Record_Segment;
+    BYTE Cluster_Per_Index_Buffer;
+    BYTE NotUsedByNTFS4[3];
+    LONGLONG Volume_Serial_Number;
+    DWORD CheckSum;
+    BYTE BS_Bootcode[426];
+    WORD BS_Signature;
+}NTFS;
 
 typedef struct RootEntry 
 {

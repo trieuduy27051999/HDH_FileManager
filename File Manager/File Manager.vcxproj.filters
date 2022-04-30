@@ -29,5 +29,8 @@
     <ClInclude Include="sector.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="FAT32.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

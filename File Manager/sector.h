@@ -7,6 +7,7 @@
 bool is_empty_sector(BYTE sector[512]);
 int ReadSector(LPCWSTR  drive, int readPoint, BYTE sector[512]);
 void showBootSectorInformation(BPB _bpb);
+void showPartitionBootSectorInformation(NTFS _bpb);
 vector<FileInfo> showRootDirectoryOrSubFolder(vector<DWORD> clusters, BPB _bpb, LPCWSTR  drive);
 DWORD ReadNextEntryOfFAT32(DWORD cluster, WORD First_Sector_Fat, LPCWSTR  drive);
 WORD convertClusterToSector(BPB _bpb, WORD cluster);
